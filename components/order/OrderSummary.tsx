@@ -2,6 +2,7 @@
 
 import { useStore } from "@/src/utils/store"
 import ProductDetails from "./ProductDetails";
+import { toast } from "react-toastify";
 import { useMemo } from "react";
 import { formatCurrency } from "@/src/utils/Index";
 import { createOrder } from "@/actions/create-order-action";
@@ -10,20 +11,37 @@ import { OrderSchema } from "@/src/schema";
 export default function OrderSummary() {
 
   const order = useStore((state) => state.order);
+  const clearOrder = useStore((state) => state.clearOrder);
   const total = useMemo(() => order.reduce((total, item) => total + (item.quantity * item.price), 0) ,[order])
 
-  const handleCreateOrder = (formData : FormData) => {
+  const handleCreateOrder = async(formData : FormData) => {
     
     const data = {
       name: formData.get('name'),
+      total,
+      order
     }
 
     const result = OrderSchema.safeParse(data);
+    if(!result.success) {
+      result.error.issues.forEach( (issue) => {
+        toast.error(issue.message)
+      })
+      return;
+    }
 
-    console.log(result);
-    return;
+    const response = await createOrder(data);
 
-    createOrder()
+    if(response?.errors) {
+      response.errors.forEach( (issue) => {
+        toast.error(issue.message)
+      } )
+    }
+
+    toast.success('Pedido creado correctamente!');
+    clearOrder()
+    
+
   }
   
   return (
