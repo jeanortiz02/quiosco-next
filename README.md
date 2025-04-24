@@ -42,7 +42,7 @@ Aplicación para la administración de un quiosco que permite gestionar producto
 
 # Correr en Desarrollo 
 
-* Duplicar el archivo .env-template
+* Duplicar el archivo env-example
 * Renombrar a .env
 * Rellenar todos los datos de las variables de entorno.
   - DATABASE_URL="<postgreesql>"
